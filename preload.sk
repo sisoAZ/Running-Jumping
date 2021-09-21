@@ -1,0 +1,29 @@
+function preload():
+	if size(all players) > 1:
+		stop
+	set {_servers::*} to get_preload_servers()
+	loop {_servers::*}:
+		if {preload} is not true:
+			stop
+		if size(all players) > 1:
+			stop
+		if "%loop-value%" parsed as world is not loaded:
+			set_server_location("%loop-value%")
+		wait 1 seconds
+
+function get_preload_servers() :: objects:
+	loop {server::id::*}:
+		if {server::%loop-value%::relese} is true:
+			set {preload_loop_sort::%loop-value%} to {server::%loop-value%::iine}
+	loop size({preload_loop_sort::*}) times:
+		set {_value} to max_iine_preload()
+		delete {preload_loop_sort::%{_value}%}
+		add {_value} to {_preload_servers::*}
+	delete {preload_loop_sort::*}
+	return {_preload_servers::*}
+
+function max_iine_preload() :: string:
+	loop {preload_loop_sort::*}:
+		set {_index::%loop-value%} to loop-index
+	set {_max_index} to max({preload_loop_sort::*})
+	return {_index::%{_max_index}%}

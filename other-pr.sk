@@ -1,0 +1,15 @@
+command /bot_hide <text>:
+    permission: siso
+    trigger:
+        if arg 1 is "on":
+            set {bot_hide} to true
+            hide player from all players
+            send "&aBOT-HIDE ON"
+        if arg 1 is "off":
+            set {bot_hide} to false
+            reveal player from all players
+            send "&aREVEAL"
+
+on join:
+    if {bot_hide} is true:
+        hide "siso_" parsed as player from all players
