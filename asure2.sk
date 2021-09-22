@@ -164,6 +164,12 @@ function set_server_location(server: text):
 			set {effect.%{_parse_loc}%} to {effect_text.%loop-value%}
 			set {effect_time.%{_parse_loc}%} to {effect_time_text.%loop-value%}
 			set {effect_lv.%{_parse_loc}%} to {effect_lv_text.%loop-value%}
+	#teleport block
+	if {server::%{_server}%::teleport_block_location_text::*} is set:
+		loop {server::%{_server}%::teleport_block_location_text::*}:
+			set {_parse_loc} to parse_text_location(loop-value)
+			add {_parse_loc} to {server::%{_server}%::teleport_block_location::*}
+			set {teleport_block_destination.%{_parse_loc}%} to parse_text_location({teleport_block_destination_text.%loop-value%})
 		
 #------set server hologram-------
 function set_hologram(server: text):
@@ -818,6 +824,68 @@ function effect_inv_set_time(p: player):
 	set slot 5 of {_p}'s current inventory to redstone named "&91秒上げる"
 	set slot 6 of {_p}'s current inventory to redstone named "&399999秒に設定する"
 	set slot 8 of {_p}'s current inventory to green wool named "&6決定する"
+
+
+#--------------
+#teleport block
+#---------------
+on leftclick:
+	name of held item contains "テレポートブロック"
+	{playerdata.%player%::joining} is true
+	{playerdata.%player%::owner} is true
+	clicked block is set
+	clicked block isn't air
+	cancel event
+	if {server::%{playerdata.%player%::joined_server}%::relese} is true:
+		if {playerdata.%player%::owner} is true:
+			send "&c公開したサーバーは""Server settings → サーバーを編集する""で再度編集ができます"
+			stop
+		else:
+			send "&cこのサーバーは既に公開済みなので編集ができません"
+			stop
+	if {server::%{playerdata.%player%::joined_server}%::teleport_block_location::*} contains location of clicked block:
+		send "&c既に登録済みのブロックです"
+		stop
+	set {teleport_block_one.%player%} to location of clicked block
+	send "&6Set teleport block pos1"
+
+on rightclick:
+	name of held item contains "テレポートブロック"
+	{playerdata.%player%::joining} is true
+	{playerdata.%player%::owner} is true
+	clicked block is set
+	clicked block isn't air
+	cancel event
+	if {server::%{playerdata.%player%::joined_server}%::relese} is true:
+		if {playerdata.%player%::owner} is true:
+			send "&c公開したサーバーは""Server settings → サーバーを編集する""で再度編集ができます"
+			stop
+		else:
+			send "&cこのサーバーは既に公開済みなので編集ができません"
+			stop
+	if {teleport_block_two.%player%} is set:
+		set block at {teleport_block_one.%player%} to empty end portal frame
+		set block at {teleport_block_two.%player%} to empty end portal frame
+		add {teleport_block_one.%player%} to {server::%{playerdata.%player%::joined_server}%::teleport_block_location::*}
+		set {teleport_block_destination.%{teleport_block_one.%player%}%} to {teleport_block_two.%player%}
+
+		set {_parse_loc} to parse_location_text({teleport_block_one.%player%})
+		add {_parse_loc} to {server::%{playerdata.%player%::joined_server}%::teleport_block_location_text::*}
+		set {teleport_block_destination_text.%{_parse_loc}%} to parse_location_text({teleport_block_two.%player%})
+		delete {teleport_block_one.%player%}
+		delete {teleport_block_two.%player%}
+		send "&6テレポートブロックの設定が完了しました"
+	else:
+		set {teleport_block_two.%player%} to location of clicked block
+		send "&6Set teleport block pos2"
+		send "&3&lPos2に設定したブロックを再度右クリックすると設定が完了します。"
+
+on walking on empty end portal frame:
+	gamemode of player is adventure or creative
+	{server::%{playerdata.%player%::joined_server}%::teleport_block_location::*} contains location of event-block
+	set {_teleport_loc} to {teleport_block_destination.%location of event-block%}
+	set {_teleport_loc}'s y-location to {_teleport_loc}'s y-location + 1
+	teleport player to {_teleport_loc}
 
 #-------------
 #Item
@@ -1578,6 +1646,12 @@ command /reportlog:
 #----------------
 
 on damage of player:
+	cancel event
+
+#-----------------
+#Non Explotion
+#-----------------
+on explosion:
 	cancel event
 
 #------------------

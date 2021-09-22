@@ -225,9 +225,14 @@ on inventory click:
 			delete {server::%{playerdata.%player%::select_server}%::comment::*}
 			delete {server::%{playerdata.%player%::select_server}%::comment_holograms::*}
 			delete {server::%{playerdata.%player%::select_server}%::iine::*}
-			loop {save::%{playerdata.%player%::select_server}%::effect_block_number} times:
-				delete {save::%loop-value%::effect_location::*}
-			delete {save::%{playerdata.%player%::select_server}%::effect_block_number}
+			loop {server::%{playerdata.%player%::select_server}%::teleport_block_location_text::*}:
+				delete {teleport_block_destination_text.%loop-value%}
+			loop {server::%{playerdata.%player%::select_server}%::effect_location_text::*}:
+				delete {effect_text.%loop-value%}
+				delete {effect_time_text.%loop-value%}
+				delete {effect_lv_text.%loop-value%}
+			delete {server::%{playerdata.%player%::select_server}%::teleport_block_location_text::*}
+			delete {server::%{playerdata.%player%::select_server}%::effect_location_text::*}
 			remove {playerdata.%player%::select_server} from {playerdata.%player%::ids::*}
 			delete {server.%player%.%{playerdata.%player%::select_server}%::*} #サーバーデータ削除
 			add "Name:%{playerdata.%player%::select_server}% MCID:%player% Deletetime:%now%" to {log::delete::*}
@@ -271,14 +276,14 @@ On anvil gui done:
 			send "&aサーバー名を&6(%event-string%)に変更しました。"
 			if {playerdata.%player%::joining} is true:
 				remove {server::%{playerdata.%player%::joined_server}%::servername} from {server::name::*}
-				remove {server::%{playerdata.%player%::joined_server}%::servername} from {playerdata.%player%::name::*}
+				remove {server::%{playerdata.%player%::joined_server}%::servername} from {playerdata.%player%::names::*}
 				add uncolored event-string to {server::name::*}
-				add uncolored event-string to {playerdata.%player%::name::*}
+				add uncolored event-string to {playerdata.%player%::names::*}
 				set {server::%{playerdata.%player%::joined_server}%::servername} to event-string
 				set {server::%uncolored event-string%::id} to {playerdata.%player%::joined_server}
 				stop
 			remove {server::%{playerdata.%player%::select_server}%::name} from {server::name::*}
-			remove {server::%{playerdata.%player%::select_server}%::name} from {playerdata.%player%::name::*}
+			remove {server::%{playerdata.%player%::select_server}%::name} from {playerdata.%player%::names::*}
 			add uncolored event-string to {server::name::*}
 			add uncolored event-string to {playerdata.%player%::name::*}
 			set {server::%{playerdata.%player%::select_server}%::servername} to event-string
@@ -1136,7 +1141,8 @@ on inventory click:
 				set {_display} to "&b夜明け"
 			set slot 4 of player's current inventory to clock named "&eサーバーの時刻を設定する: %{_display}%" with lore "&6サーバーの景観に合った時間を設定できます。"
 		set slot 5 of player's current inventory to blue stained glass pane named "&3ホログラムの位置を変更する。" with lore "&6自分の位置から斜め前に設置されます。"
-		set slot 6 of player's current inventory to lever named "&cスタート地点とゴール地点を削除する。" with lore "&6スタート地点とゴール地点を削除します"
+		set slot 6 of player's current inventory to empty end portal frame named "&5テレポートブロックを設定する。" with lore "&6ブロックを踏むとテレポートする効果を付けれます。"
+		set slot 7 of player's current inventory to lever named "&cスタート地点とゴール地点を削除する。" with lore "&6スタート地点とゴール地点を削除します"
 	if name of clicked item contain "スポーン地点を設定する。":
 		{playerdata.%player%::owner} is true #サーバーオーナーか確認
 		set {_oldspawn} to {server::%{playerdata.%player%::joined_server}%::spawn}
@@ -1389,6 +1395,10 @@ on inventory click:
 			set {server::%{playerdata.%player%::joined_server}%::hologram_location_text} to parse_location_text(location of player)
 			set_hologram({playerdata.%player%::joined_server})
 			send "&aホログラムの位置を変更しました。"
+			stop
+		if name of clicked item contain "テレポートブロックを設定する。":
+			close player's inventory
+			give empty end portal frame named "&5テレポートブロック" with lore "&6左クリックで一番目のテレポートブロックを指定。" and "&9右クリックで二番目のテレポートブロックを指定。" to player
 			stop
 		if name of clicked item contain "スタート地点とゴール地点を削除する。":
 			close player's inventory
