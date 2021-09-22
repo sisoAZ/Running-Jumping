@@ -256,7 +256,7 @@ On anvil gui done:
 			send "&cその文字は使用できません"
 			stop
 		
-		if {_anvil_name} is "server_name" or "server_name_change":
+		if {_anvil_name} is "server_name":
 			if event-string contain "&":
 				send "&c色は使用できません"
 				stop
@@ -265,6 +265,9 @@ On anvil gui done:
 			stop
 		
 		if {_anvil_name} is "server_name_change":
+			if event-string contain "&":
+				send "&c色は使用できません"
+				stop
 			send "&aサーバー名を&6(%event-string%)に変更しました。"
 			if {playerdata.%player%::joining} is true:
 				remove {server::%{playerdata.%player%::joined_server}%::servername} from {server::name::*}
