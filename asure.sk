@@ -256,7 +256,7 @@ On anvil gui done:
 			send "&cその文字は使用できません"
 			stop
 		
-		if {_anvil_name} is "server_name":
+		if {_anvil_name} is "server_name" or "server_name_change":
 			if event-string contain "&":
 				send "&c色は使用できません"
 				stop
@@ -355,27 +355,27 @@ function show_server_list(p: player):
 				set slot {_slots} of {_p}'s current inventory to emerald block named "%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "&lWhitelist"
 			else if {server::%{_value}%::custom_icon} is set:
 				if {server::%{_value}%::ranked} is true: #if ranked
-					set slot {_slots} of {_p}'s current inventory to {server::%{_value}%::custom_icon} named "&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
+					set slot {_slots} of {_p}'s current inventory to {server::%{_value}%::custom_icon} named "&a&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
 				else: #if no ranked
-					set slot {_slots} of {_p}'s current inventory to {server::%{_value}%::custom_icon} named "&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
+					set slot {_slots} of {_p}'s current inventory to {server::%{_value}%::custom_icon} named "&a&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
 			else:
 				if {server::%{_value}%::ranked} is true: #if ranked
-					set slot {_slots} of {_p}'s current inventory to emerald block named "&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
+					set slot {_slots} of {_p}'s current inventory to emerald block named "&a&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
 				else:
-					set slot {_slots} of {_p}'s current inventory to emerald block named "&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞ &3クリア人数&f:&9%size({server::%{_value}%::goal::*})%" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
+					set slot {_slots} of {_p}'s current inventory to emerald block named "&a&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞ &3クリア人数&f:&9%size({server::%{_value}%::goal::*})%" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
 		else:
 			if {server::%{_value}%::whitelist} is true:
 				set slot {_slots} of {_p}'s current inventory to emerald block named "%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%" and "&lWhitelist"
 			else if {server::%{_value}%::custom_icon} is set:
 				if {server::%{_value}%::ranked} is true:
-					set slot {_slots} of {_p}'s current inventory to {server::%{_value}%::custom_icon} named "&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
+					set slot {_slots} of {_p}'s current inventory to {server::%{_value}%::custom_icon} named "&a&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
 				else:
-					set slot {_slots} of {_p}'s current inventory to {server::%{_value}%::custom_icon} named "&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
+					set slot {_slots} of {_p}'s current inventory to {server::%{_value}%::custom_icon} named "&a&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
 			else:
 				if {server::%{_value}%::ranked} is true:
-					set slot {_slots} of {_p}'s current inventory to emerald block named "&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
+					set slot {_slots} of {_p}'s current inventory to emerald block named "&a&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
 				else:
-					set slot {_slots} of {_p}'s current inventory to emerald block named "%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
+					set slot {_slots} of {_p}'s current inventory to emerald block named "&a&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
 		add 1 to {_slots}
 
 #------iine function------- #いいね順が多いものを返す
@@ -432,7 +432,7 @@ on inventory click:
 						if {server::%loop-value%::ranked} is true:
 							set slot {_slots} of player's current inventory to emerald block named "&l%{server::%loop-value%::servername}% &a✔" with lore "&a%size({server::%loop-value%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%loop-value%::owner}% &d&l❤&f:%{server::%loop-value%::iine}%" and "%{server::%loop-value%::motd}%"
 						else:
-							set slot {_slots} of player's current inventory to emerald block named "%{server::%loop-value%::servername}%" with lore "&a%size({server::%loop-value%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%loop-value%::owner}% &d&l❤&f:%{server::%loop-value%::iine}%" and "%{server::%loop-value%::motd}%"
+							set slot {_slots} of player's current inventory to emerald block named "&l%{server::%loop-value%::servername}%" with lore "&a%size({server::%loop-value%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%loop-value%::owner}% &d&l❤&f:%{server::%loop-value%::iine}%" and "%{server::%loop-value%::motd}%"
 				add 1 to {_slots}
 				delete {server.page.%player%::%loop-index%}
 			stop
@@ -454,27 +454,27 @@ on inventory click:
 						set slot {_slots} of player's current inventory to emerald block named "%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "&lWhitelist"
 					else if {server::%{_value}%::custom_icon} is set:
 						if {server::%{_value}%::ranked} is true: #if ranked
-							set slot {_slots} of player's current inventory to {server::%{_value}%::custom_icon} named "&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
+							set slot {_slots} of player's current inventory to {server::%{_value}%::custom_icon} named "&a&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
 						else: #if no ranked
-							set slot {_slots} of player's current inventory to {server::%{_value}%::custom_icon} named "&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
+							set slot {_slots} of player's current inventory to {server::%{_value}%::custom_icon} named "&a&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
 					else:
 						if {server::%{_value}%::ranked} is true: #if ranked
-							set slot {_slots} of player's current inventory to emerald block named "&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
+							set slot {_slots} of player's current inventory to emerald block named "&a&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
 						else:
-							set slot {_slots} of player's current inventory to emerald block named "&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞ &3クリア人数&f:&9%size({server::%{_value}%::goal::*})%" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
+							set slot {_slots} of player's current inventory to emerald block named "&a&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞ &3クリア人数&f:&9%size({server::%{_value}%::goal::*})%" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
 				else:
 					if {server::%{_value}%::whitelist} is true:
 						set slot {_slots} of player's current inventory to emerald block named "%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%" and "&lWhitelist"
 					else if {server::%{_value}%::custom_icon} is set:
 						if {server::%{_value}%::ranked} is true:
-							set slot {_slots} of player's current inventory to {server::%{_value}%::custom_icon} named "&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
+							set slot {_slots} of player's current inventory to {server::%{_value}%::custom_icon} named "&a&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
 						else:
-							set slot {_slots} of player's current inventory to {server::%{_value}%::custom_icon} named "&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
+							set slot {_slots} of player's current inventory to {server::%{_value}%::custom_icon} named "&a&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
 					else:
 						if {server::%{_value}%::ranked} is true:
-							set slot {_slots} of player's current inventory to emerald block named "&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
+							set slot {_slots} of player's current inventory to emerald block named "&a&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
 						else:
-							set slot {_slots} of player's current inventory to emerald block named "%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
+							set slot {_slots} of player's current inventory to emerald block named "&a&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
 				add 1 to {_slots}
 			stop
 #------sort system--------
@@ -526,16 +526,16 @@ on inventory click:
 				if {server::%{_value}%::whitelist} is true:
 					set slot {_slots} of player's current inventory to emerald block named "%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "&lWhitelist"
 				else if {server::%{_value}%::custom_icon} is set:
-					set slot {_slots} of player's current inventory to {server::%{_value}%::custom_icon} named "&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
+					set slot {_slots} of player's current inventory to {server::%{_value}%::custom_icon} named "&a&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
 				else:
-					set slot {_slots} of player's current inventory to emerald block named "&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
+					set slot {_slots} of player's current inventory to emerald block named "&a&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
 			else:
 				if {server::%{_value}%::whitelist} is true:
 					set slot {_slots} of player's current inventory to emerald block named "%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%" and "&lWhitelist"
 				else if {server::%{_value}%::custom_icon} is set:
-					set slot {_slots} of player's current inventory to {server::%{_value}%::custom_icon} named "&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
+					set slot {_slots} of player's current inventory to {server::%{_value}%::custom_icon} named "&a&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
 				else:
-					set slot {_slots} of player's current inventory to emerald block named "%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
+					set slot {_slots} of player's current inventory to emerald block named "&a&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
 			add 1 to {_slots}
 		set slot 1 of player's current inventory to green glass pane named "&r"
 		stop
@@ -608,27 +608,27 @@ function sort_server(p: player, diff: text):
 				set slot {_slots} of {_p}'s current inventory to emerald block named "%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "&lWhitelist"
 			else if {server::%{_value}%::custom_icon} is set:
 				if {server::%{_value}%::ranked} is true: #if ranked
-					set slot {_slots} of {_p}'s current inventory to {server::%{_value}%::custom_icon} named "&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
+					set slot {_slots} of {_p}'s current inventory to {server::%{_value}%::custom_icon} named "&a&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
 				else: #if no ranked
-					set slot {_slots} of {_p}'s current inventory to {server::%{_value}%::custom_icon} named "&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
+					set slot {_slots} of {_p}'s current inventory to {server::%{_value}%::custom_icon} named "&a&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
 			else:
 				if {server::%{_value}%::ranked} is true: #if ranked
-					set slot {_slots} of {_p}'s current inventory to emerald block named "&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
+					set slot {_slots} of {_p}'s current inventory to emerald block named "&a&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
 				else:
-					set slot {_slots} of {_p}'s current inventory to emerald block named "&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞ &3クリア人数&f:&9%size({server::%{_value}%::goal::*})%" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
+					set slot {_slots} of {_p}'s current inventory to emerald block named "&a&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞ &3クリア人数&f:&9%size({server::%{_value}%::goal::*})%" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%"
 		else:
 			if {server::%{_value}%::whitelist} is true:
 				set slot {_slots} of {_p}'s current inventory to emerald block named "%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%" and "&lWhitelist"
 			else if {server::%{_value}%::custom_icon} is set:
 				if {server::%{_value}%::ranked} is true:
-					set slot {_slots} of {_p}'s current inventory to {server::%{_value}%::custom_icon} named "&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
+					set slot {_slots} of {_p}'s current inventory to {server::%{_value}%::custom_icon} named "&a&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
 				else:
-					set slot {_slots} of {_p}'s current inventory to {server::%{_value}%::custom_icon} named "&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
+					set slot {_slots} of {_p}'s current inventory to {server::%{_value}%::custom_icon} named "&a&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
 			else:
 				if {server::%{_value}%::ranked} is true:
-					set slot {_slots} of {_p}'s current inventory to emerald block named "&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
+					set slot {_slots} of {_p}'s current inventory to emerald block named "&a&l%{server::%{_value}%::servername}% &a✔" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
 				else:
-					set slot {_slots} of {_p}'s current inventory to emerald block named "%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
+					set slot {_slots} of {_p}'s current inventory to emerald block named "&a&l%{server::%{_value}%::servername}%" with lore "&a%size({server::%{_value}%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%{_value}%::owner}% &d&l❤&f:%{server::%{_value}%::iine}%" and "%{server::%{_value}%::motd}%"
 		add 1 to {_slots}
 	stop
 
@@ -710,7 +710,7 @@ function sort_server_details(p: player, sort: text, sort_text: text = ""):
 				if {server::%loop-value%::ranked} is true:
 					set slot {_slots} of {_p}'s current inventory to emerald block named "&l%{server::%loop-value%::servername}% &a✔" with lore "&a%size({server::%loop-value%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%loop-value%::owner}% &d&l❤&f:%{server::%loop-value%::iine}%" and "%{server::%loop-value%::motd}%"
 				else:
-					set slot {_slots} of {_p}'s current inventory to emerald block named "%{server::%loop-value%::servername}%" with lore "&a%size({server::%loop-value%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%loop-value%::owner}% &d&l❤&f:%{server::%loop-value%::iine}%" and "%{server::%loop-value%::motd}%"
+					set slot {_slots} of {_p}'s current inventory to emerald block named "&l%{server::%loop-value%::servername}%" with lore "&a%size({server::%loop-value%::playing::*})%&7/∞" and "&6Owner&3:&a&l%{server::%loop-value%::owner}% &d&l❤&f:%{server::%loop-value%::iine}%" and "%{server::%loop-value%::motd}%"
 		add 1 to {_slots}
 		delete {server.page.%{_p}%::%loop-index%}
 	stop
@@ -975,7 +975,7 @@ on quit:
 	delete {server::<none>::relese} #バグ対策
 	wait 1 seconds
 	preload()
-	loop all players:#unko
+	loop all players:
 		set tab header to " &6&lRunning &e&lJumping" and footer to "&9Online Player &a%number of all players%&7/20" for loop-player
 
 #------server join-------
