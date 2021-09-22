@@ -973,9 +973,10 @@ on quit:
 	delete {effect_double.%player%}
 	command "/effect %player% clear"
 	delete {server::<none>::relese} #バグ対策
+	wait 1 seconds
 	preload()
-	loop all players:
-		set tab header to "&6&lアスレチック" and footer to "&9Online Player &a%number of all players%&7/20" for loop-player
+	loop all players:#unko
+		set tab header to " &6&lRunning &e&lJumping" and footer to "&9Online Player &a%number of all players%&7/20" for loop-player
 
 #------server join-------
 on join:
@@ -1005,7 +1006,7 @@ on join:
 			send loop-value
 		delete {playerdata.%player%::notification::*}
 	loop all players:
-		set tab header to "&6&lRunning &e&lJumping" and footer to "&9Online Player &a%number of all players%&7/20" for loop-player
+		set tab header to " &6&lRunning &e&lJumping" and footer to "&9Online Player &a%number of all players%&7/20" for loop-player
 	wait 1 tick
 	execute player command "/back"
 
@@ -1131,11 +1132,12 @@ on inventory click:
 			else if {server::%{playerdata.%player%::joined_server}%::world_time} is dawn:
 				set {_display} to "&b夜明け"
 			set slot 4 of player's current inventory to clock named "&eサーバーの時刻を設定する: %{_display}%" with lore "&6サーバーの景観に合った時間を設定できます。"
-		set slot 5 of player's current inventory to lever named "&cスタート地点とゴール地点を削除する。" with lore "&6スタート地点とゴール地点を削除します"
+		set slot 5 of player's current inventory to blue stained glass pane named "&3ホログラムの位置を変更する。" with lore "&6自分の位置から斜め前に設置されます。"
+		set slot 6 of player's current inventory to lever named "&cスタート地点とゴール地点を削除する。" with lore "&6スタート地点とゴール地点を削除します"
 	if name of clicked item contain "スポーン地点を設定する。":
 		{playerdata.%player%::owner} is true #サーバーオーナーか確認
+		set {_oldspawn} to {server::%{playerdata.%player%::joined_server}%::spawn}
 		if {server::%{playerdata.%player%::joined_server}%::relese} is true:
-			set {_oldspawn} to {server::%{playerdata.%player%::joined_server}%::spawn}
 			if {_oldspawn} != location of player:
 				open chest with 1 row named "&c確認(スポーン)" to player
 				set slot 3 of player's current inventory to light green wool named "&a変更する"
@@ -1143,7 +1145,11 @@ on inventory click:
 				set slot 5 of player's current inventory to red wool named "&cキャンセル"
 				stop
 		set {server::%{playerdata.%player%::joined_server}%::spawn} to location of player
-		set {server::%{playerdata.%player%::joined_server}%::spawn_text} to parse_location_text(location of player) 
+		set {server::%{playerdata.%player%::joined_server}%::spawn_text} to parse_location_text(location of player)
+		if {_oldspawn} is not set:
+			set {server::%{playerdata.%player%::joined_server}%::hologram_location} to location of player
+			set {server::%{playerdata.%player%::joined_server}%::hologram_location_text} to parse_location_text(location of player)
+			set_hologram({playerdata.%player%::joined_server})
 		send "&6スポーン地点を&a(%location of player%)&6セットしました"
 		stop
 	if name of clicked item contain "サーバーを編集する":
@@ -1374,6 +1380,12 @@ on inventory click:
 			if {server::%{playerdata.%player%::joined_server}%::world_time} is not set:
 				set {server::%{playerdata.%player%::joined_server}%::world_time} to day
 			set slot clicked slot of player's current inventory to clock named "&eサーバーの時刻を設定する: %{_display}%" with lore "&6サーバーの景観に合った時間を設定できます。"
+			stop
+		if name of clicked item contains "ホログラムの位置を変更する":
+			set {server::%{playerdata.%player%::joined_server}%::hologram_location} to location of player
+			set {server::%{playerdata.%player%::joined_server}%::hologram_location_text} to parse_location_text(location of player)
+			set_hologram({playerdata.%player%::joined_server})
+			send "&aホログラムの位置を変更しました。"
 			stop
 		if name of clicked item contain "スタート地点とゴール地点を削除する。":
 			close player's inventory

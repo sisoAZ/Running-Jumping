@@ -150,7 +150,8 @@ function set_server_location(server: text):
 		set {server::%{_server}%::endpoint} to parse_text_location({server::%{_server}%::endpoint_text})
 	#set hologram
 	set {server::%{_server}%::skull} to skull of "%{server::%{_server}%::owner}%" parsed as offline player
-	if {server::%{_server}%::spawn} is set:
+	if {server::%{_server}%::hologram_location_text} is set:
+		set {server::%{_server}%::hologram_location} to parse_text_location({server::%{_server}%::hologram_location_text})
 		set_hologram({_server})
 	#set comment
 	if {server::%{_server}%::comment::*} is set:
@@ -170,12 +171,12 @@ function set_hologram(server: text):
 	delete hologram {server::%{_server}%::hologram_description}
 
 	#Set Hologram (Ranking & discription)
-	set {_x} to {server::%{_server}%::spawn}'s x-loc
-	set {_y} to {server::%{_server}%::spawn}'s y-loc
-	set {_z} to {server::%{_server}%::spawn}'s z-loc
+	set {_x} to {server::%{_server}%::hologram_location}'s x-loc
+	set {_y} to {server::%{_server}%::hologram_location}'s y-loc
+	set {_z} to {server::%{_server}%::hologram_location}'s z-loc
 	set {_world} to {_server} parsed as world
-	set {_yaw} to yaw of {server::%{_server}%::spawn}
-	set {_pitch} to pitch of {server::%{_server}%::spawn}
+	set {_yaw} to yaw of {server::%{_server}%::hologram_location}
+	set {_pitch} to pitch of {server::%{_server}%::hologram_location}
 
 	set {_plus_sin} to sin({_yaw})
 	set {_plus_cos} to cos({_yaw})

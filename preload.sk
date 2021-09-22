@@ -7,6 +7,9 @@ function preload():
 			stop
 		if size(all players) > 1:
 			stop
+		set {_server_size} to size({_servers::*})
+		if "%{_servers::%{_server_size}%}%" parsed as world is loaded:
+			stop
 		if "%loop-value%" parsed as world is not loaded:
 			set_server_location("%loop-value%")
 		wait 1 seconds
