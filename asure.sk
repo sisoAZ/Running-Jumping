@@ -877,6 +877,7 @@ command /ptp [<player>]:
 				set {playerdata.%player%::display_name} to {server::%{playerdata.%arg 1%::joined_server}%::servername}
 				set {playerdata.%player%::joined_server} to {playerdata.%arg 1%::joined_server}
 				set {playerdata.%player%::joining} to true
+				delete {playerdata.%player%::owner}
 				add player to {server::%{playerdata.%arg 1%::joined_server}%::playing::*}
 				command "/mv tp %player% %{playerdata.%arg 1%::joined_server}%" #server TP
 				if {server::%{playerdata.%player%::joined_server}%::already_played::%player%} is not set:
@@ -902,6 +903,7 @@ command /ptp [<player>]:
 				if {playerdata.%player%::joined_server} is set:
 					remove player from {server::%{playerdata.%player%::joined_server}%::playing::*}
 				set {playerdata.%player%::joined_server} to {playerdata.%arg 1%::joined_server}
+				delete {playerdata.%player%::owner}
 				command "/mv tp %player% %{playerdata.%arg 1%::joined_server}%"
 				wait 1 tick
 				if {playerdata.%player%::invite} is true:
