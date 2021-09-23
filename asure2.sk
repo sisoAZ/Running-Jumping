@@ -86,7 +86,7 @@ command /serverhelp:
 		send "&6&lワールドエディット使えます。 (コンパスのテレポートは金塊に置き換わってます)"
 		send "&6&lVoxelSniper使えます。"
 		send "&6&l/mv gamerulesでゲームルールを確認できます。 (設定するときは /mv gamerule keepInventory true みたいな感じ)"
-		send "&6&l/time /weather /setblock使えます。"
+		send "&6&l/time /weather使えます。"
 		send "&6&lバグとか違反とか色々運営に報告したいときは/report (要件) でお願いします。"
 
 #---------------
@@ -327,7 +327,6 @@ function luckperms_setup():
 	command "/luckperms group default_command permission set minecraft.command.gamemode true"
 	command "/luckperms group default_command permission set minecraft.command.weather true"
 	command "/luckperms group default_command permission set minecraft.command.time true"
-	command "/luckperms group default_command permission set minecraft.command.setblock true"
 
 	#Multiverse
 	command "/luckperms deletegroup multiverse"
@@ -818,6 +817,8 @@ on break of blue concrete or green concrete:
 	delete {effect_time.%location of event-block%}
 	delete {effect_lv.%location of event-block%}
 	delete {effect.%location of event-block%}
+	set {_parse_loc} to parse_location_text(location of event-block)
+	remove {_parse_loc} from {server::%{playerdata.%player%::joined_server}%::effect_location::*}
 	send "&cポーションブロックを削除しました"
 
 function effect_inv_set_lv(p: player):
@@ -875,6 +876,12 @@ on rightclick:
 			send "&cこのサーバーは既に公開済みなので編集ができません"
 			stop
 	if {teleport_block_two.%player%} is set:
+		if {teleport_block_one.%player%} is not set:
+			send "&c一つ目のポジションを決めてください"
+			stop
+		if {server::%{playerdata.%player%::joined_server}%::teleport_block_location::*} contains {teleport_block_one.%player%}:
+			send "&c一つ目のポジションは既に別のテレポートブロックが設定されています"
+			stop
 		set block at {teleport_block_one.%player%} to empty end portal frame
 		set block at {teleport_block_two.%player%} to empty end portal frame
 		add {teleport_block_one.%player%} to {server::%{playerdata.%player%::joined_server}%::teleport_block_location::*}
@@ -897,6 +904,15 @@ on walking on empty end portal frame:
 	set {_teleport_loc} to {teleport_block_destination.%location of event-block%}
 	set {_teleport_loc}'s y-location to {_teleport_loc}'s y-location + 1
 	teleport player to {_teleport_loc}
+
+on break of empty end portal frame:
+	{server::%{playerdata.%player%::joined_server}%::teleport_block_location::*} contains location of event-block
+	remove location of event-block from {server::%{playerdata.%player%::joined_server}%::teleport_block_location::*}
+	delete {teleport_block_destination.%location of event-block%}
+	set {_parse_loc} to parse_location_text(location of event-block)
+	remove {_parse_loc} from {server::%{playerdata.%player%::joined_server}%::teleport_block_location_text::*}
+	delete {teleport_block_destination_text.%{_parse_loc}%}
+	send "&cテレポートブロックを削除しました"
 
 #-------------
 #Item
