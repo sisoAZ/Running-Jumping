@@ -84,6 +84,7 @@ command /serverhelp:
 		send "&3/dcで""自分の""チェックポイントを削除できます。"
 		send "&3/ptp (プレイヤー)でそのプレイヤーの遊んでるサーバーにTPできます"
 		send "&6&lワールドエディット使えます。 (コンパスのテレポートは金塊に置き換わってます)"
+		send "&6&lVoxelSniper使えます。"
 		send "&6&l/mv gamerulesでゲームルールを確認できます。 (設定するときは /mv gamerule keepInventory true みたいな感じ)"
 		send "&6&l/time /weather /setblock使えます。"
 		send "&6&lバグとか違反とか色々運営に報告したいときは/report (要件) でお願いします。"
@@ -220,8 +221,10 @@ function set_hologram(server: text):
 	#Hologram (Server Description)
 	set {_rotate_sin} to sin({_yaw} + 45)
 	set {_rotate_cos} to cos({_yaw} + 45)
-	set {_loc_sin} to ({_plus_sin} + {_rotate_sin}) * 3 * -1
-	set {_loc_cos} to ({_plus_cos} + {_rotate_cos}) * 3
+	set {_total_sin} to {_plus_sin} + {_rotate_sin}
+	set {_total_cos} to {_plus_cos} + {_rotate_cos}
+	set {_loc_sin} to {_total_sin} * 3 * -1
+	set {_loc_cos} to {_total_cos} * 3
 	set {_hologram_loc} to location({_x} + {_loc_sin}, {_y} + 5, {_z} + {_loc_cos}, {_world}, {_yaw}, {_pitch})
 	create a new hologram with line "&6&l%{server::%{_server}%::servername}%" at {_hologram_loc}
 	set {_holo} to last created hologram
@@ -320,6 +323,7 @@ function luckperms_setup():
 	#Default
 	command "/luckperms deletegroup default_command"
 	command "/luckperms creategroup default_command"
+	command "/luckperms group default_command permission set minecraft.command.gamemode true"
 	command "/luckperms group default_command permission set minecraft.command.weather true"
 	command "/luckperms group default_command permission set minecraft.command.time true"
 	command "/luckperms group default_command permission set minecraft.command.setblock true"
@@ -339,7 +343,9 @@ function luckperms_setup():
 	command "/luckperms group worldedit permission set worldedit.region.* true"
 	command "/luckperms group worldedit permission set worldedit.tool.* true"
 	command "/luckperms group worldedit permission set worldedit.biome.* true"
+	command "/luckperms group worldedit permission set worldedit.navigation.* true"
 	command "/luckperms group worldedit permission set worldedit.global-mask true"
+	command "/luckperms group worldedit permission set worldedit.fixwater true"
 	command "/luckperms group worldedit permission set worldedit.generation.cylinder true"
 	command "/luckperms group worldedit permission set worldedit.history.undo true"
 	command "/luckperms group worldedit permission set worldedit.history.redo true"
@@ -348,6 +354,7 @@ function luckperms_setup():
 	command "/luckperms group worldedit permission set worldedit.selection.size true"
 	command "/luckperms group worldedit permission set worldedit.brush.* true"
 	command "/luckperms group worldedit permission set worldedit.schematic.load true"
+	command "/luckperms group worldedit permission set worldedit.schematic.load.other true"
 	command "/luckperms group worldedit permission set worldedit.help true"
 	command "/luckperms group worldedit permission set fawe.admin true"
 
@@ -515,6 +522,7 @@ on walking on lapis block:
 	if {playerdata.%player%::practice_mode} is true:
 		send "&c練習モードの状態ではタイマーは開始されません"
 		stop
+	$ thread
 	timer(player)
 	send "&a%{playerdata.%player%::display_name}% &6Start"
 	sound("block.note.pling", player, 2)
@@ -1426,8 +1434,7 @@ on creative inventory click:
 		send "&cTNTは使用できません"
 		stop
 	if "%event-item%" contain "barrier":
-		cancel event
-		send "&cバリアブロックは使用できません"
+		send "&cバリアブロックを製作者用ルートなどに使用しないでください。"
 		stop
 	if {server::%{playerdata.%player%::joined_server}%::elytra} is not true:
 		if "%event-item%" contain "elytra":
@@ -1555,52 +1562,53 @@ on command:
 	broadcast "&3&lSkriptのリロードをします"
 
 #------gamemode-----
-on command:
-	command contain "gamemode"
-	player is not ops
-	{playerdata.%player%::joining} is true
-	{playerdata.%player%::check} is not true
-	{server::%player's world%::relese} is not true
-	check [check [{playerdata.%player%::owner} is true] or check [{server::%{playerdata.%player%::joined_server}%::permission::*} contains player]] #サーバーのオーナーまたは権限持ちか
-	cancel event
-	set {_args::*} to arguments
-	if {_args::1} contain " ":
-		set {_args::*} to {_args::1} split at " "
-	if {_args::2} is not set:
-		if {_args::1} is "0" or "s" or "survival" or "1" or "c" or "creative" or "2" or "a" or "adventure" or "3" or "sp" or "spectator":
-			if {_args::1} is "0" or "０" or "s" or "survival":
-				set {_gm} to survival
-			if {_args::1} is "1" or "１" or "c" or "I" or "Ｉ" or "ⅰ" or "Ⅰ" or "creative":
-				set {_gm} to creative
-			if {_args::1} is "2" or "２" or "a" or "II" or "ＩＩ" or "ⅱ" or "Ⅱ" or "adventure":
-				set {_gm} to adventure
-			if {_args::1} is "3" or "３" or "sp" or "III" or "ＩＩＩ" or "ⅲ" or "Ⅲ" or "spectator":
-				set {_gm} to spectator
-			set gamemode of player to {_gm}
-			stop
-		else:
-			send "&cゲームモードを指定してください。"
-			stop
-	if {_args::2} is set: #プレイヤーを指定していたら
-		if {server::%{playerdata.%player%::joined_server}%::playing::*} contains {_args::2}: #指定したプレイヤーが遊んでるサーバーにいたら
-			{playerdata.%{_args::2}%::check} is not true
-			if {_args::1} is "0" or "s" or "survival" or "1" or "c" or "creative" or "2" or "a" or "adventure" or "3" or "sp" or "spectator":
-				if {_args::1} is "0" or "０" or "s" or "survival":
-					set {_gm} to survival
-				if {_args::1} is "1" or "１" or "c" or "I" or "Ｉ" or "ⅰ" or "Ⅰ" or "creative":
-					set {_gm} to creative
-				if {_args::1} is "2" or "２" or "a" or "II" or "ＩＩ" or "ⅱ" or "Ⅱ" or "adventure":
-					set {_gm} to adventure
-				if {_args::1} is "3" or "３" or "sp" or "III" or "ＩＩＩ" or "ⅲ" or "Ⅲ" or "spectator":
-					set {_gm} to spectator
-				set gamemode of {_args::2} parsed as player to {_gm}
-				stop
-			else:
-				send "&cゲームモードを指定してください。"
-				stop
-		else:
-			send "&cそのプレイヤーは&3%{server::%{playerdata.%player%::joined_server}%::servername}%&cで遊んでません"
-			stop
+#Luckpermsで管理するよう変更
+#on command:
+#	command contain "gamemode"
+#	player is not ops
+#	{playerdata.%player%::joining} is true
+#	{playerdata.%player%::check} is not true
+#	{server::%player's world%::relese} is not true
+#	check [check [{playerdata.%player%::owner} is true] or check [{server::%{playerdata.%player%::joined_server}%::permission::*} contains player]] #サーバーのオーナーまたは権限持ちか
+#	cancel event
+#	set {_args::*} to arguments
+#	if {_args::1} contain " ":
+#		set {_args::*} to {_args::1} split at " "
+#	if {_args::2} is not set:
+#		if {_args::1} is "0" or "s" or "survival" or "1" or "c" or "creative" or "2" or "a" or "adventure" or "3" or "sp" or "spectator":
+#			if {_args::1} is "0" or "０" or "s" or "survival":
+#				set {_gm} to survival
+#			if {_args::1} is "1" or "１" or "c" or "I" or "Ｉ" or "ⅰ" or "Ⅰ" or "creative":
+#				set {_gm} to creative
+#			if {_args::1} is "2" or "２" or "a" or "II" or "ＩＩ" or "ⅱ" or "Ⅱ" or "adventure":
+#				set {_gm} to adventure
+#			if {_args::1} is "3" or "３" or "sp" or "III" or "ＩＩＩ" or "ⅲ" or "Ⅲ" or "spectator":
+#				set {_gm} to spectator
+#			set gamemode of player to {_gm}
+#			stop
+#		else:
+#			send "&cゲームモードを指定してください。"
+#			stop
+#	if {_args::2} is set: #プレイヤーを指定していたら
+#		if {server::%{playerdata.%player%::joined_server}%::playing::*} contains {_args::2}: #指定したプレイヤーが遊んでるサーバーにいたら
+#			{playerdata.%{_args::2}%::check} is not true
+#			if {_args::1} is "0" or "s" or "survival" or "1" or "c" or "creative" or "2" or "a" or "adventure" or "3" or "sp" or "spectator":
+#				if {_args::1} is "0" or "０" or "s" or "survival":
+#					set {_gm} to survival
+#				if {_args::1} is "1" or "１" or "c" or "I" or "Ｉ" or "ⅰ" or "Ⅰ" or "creative":
+#					set {_gm} to creative
+#				if {_args::1} is "2" or "２" or "a" or "II" or "ＩＩ" or "ⅱ" or "Ⅱ" or "adventure":
+#					set {_gm} to adventure
+#				if {_args::1} is "3" or "３" or "sp" or "III" or "ＩＩＩ" or "ⅲ" or "Ⅲ" or "spectator":
+#					set {_gm} to spectator
+#				set gamemode of {_args::2} parsed as player to {_gm}
+#				stop
+#			else:
+#				send "&cゲームモードを指定してください。"
+#				stop
+#		else:
+#			send "&cそのプレイヤーは&3%{server::%{playerdata.%player%::joined_server}%::servername}%&cで遊んでません"
+#			stop
 
 #-----------------
 #entity click

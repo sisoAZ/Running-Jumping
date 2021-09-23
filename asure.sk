@@ -11,7 +11,7 @@ command /create [<text>]:
 			stop
 		set {_set_server_id} to random 5 char string from `a-z0-9`
 		if {server::name::*} contain arg 1:
-			send "&cエラー、再度お試しください"
+			send "&cエラー、名前が既に使用されている。又はマインクラフトのバージョンが1.12ではありません。"
 			stop
 		#if {server::id::*} contain {_set_server_id}:
 			#send "&cエラー、再度お試しください"
@@ -38,7 +38,7 @@ command /create [<text>]:
 		send "&e%player% &3Server created &a(%arg 1%)" to ops
 		command "/mv clone Baseworld %{_set_server_id}%"
 		command "/mv tp %player% %{_set_server_id}%"
-		wait 1 tick
+		wait 2 tick
 		set player's gamemode to creative
 		clear player's inventory
 		teleport player to location at (0, 4, 0)
@@ -727,6 +727,7 @@ function sort_server_details(p: player, sort: text, sort_text: text = ""):
 #iine
 #----------------
 on inventory click:
+	set {server::%{_server}%::hologram_description} to last created hologram 
 	name of player's current inventory contain "Server list"
 	{playerdata.%player%::iine_select} is true
 	cancel event
@@ -734,7 +735,9 @@ on inventory click:
 	clicked item isn't green glass pane
 	clicked slot isn't 9 or 18 or 27 or 36 or 53 or 1
 	if uncolored name of clicked item contain "✔":
-		set {_ranked_subtext} to first length of uncolored name of clicked item - 2 characters of uncolored name of clicked item #サーバー名を正確に取得するため(-2はRankedのマークと空白)
+		set {_uncolored_name} to uncolored name of clicked item
+		set {_length} to length of {_uncolored_name} - 2 #サーバー名を正確に取得するため(-2はRankedのマークと空白)
+		set {_ranked_subtext} to first {_length} characters of uncolored name of clicked item
 		set {playerdata.%player%::iine_select_server} to {server::%{_ranked_subtext}%::id} #Get server id
 	else:
 		set {playerdata.%player%::iine_select_server} to {server::%uncolored name of clicked item%::id} #Get server id
@@ -790,6 +793,7 @@ on right click on villager:
 #---------------
 
 on inventory click:
+	set {server::%{_server}%::hologram_description} to last created hologram
 	name of player's current inventory contain "Server list"
 	{playerdata.%player%::iine_select} is not true
 	{playerdata.%player%::room::room} is not set #asure_room
@@ -800,7 +804,9 @@ on inventory click:
 	name of clicked item don't contain "サーバーを探す" #line 104 details
 	clicked inventory is not player's inventory
 	if uncolored name of clicked item contain "✔":
-		set {_ranked_subtext} to first length of uncolored name of clicked item - 2 characters of uncolored name of clicked item #サーバー名を正確に取得するため(-2はRankedのマークと空白)
+		set {_uncolored_name} to uncolored name of clicked item
+		set {_length} to length of {_uncolored_name} - 2 #サーバー名を正確に取得するため(-2はRankedのマークと空白)
+		set {_ranked_subtext} to first {_length} characters of uncolored name of clicked item
 		set {_servername} to {server::%{_ranked_subtext}%::id} #Get server id
 		set {_display_name} to {_ranked_subtext}
 	else:
