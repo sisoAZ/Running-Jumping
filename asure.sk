@@ -186,6 +186,7 @@ on inventory click:
 			if {server::%{_servername}%::owner_time} is set:
 				send "&3サーバーオーナー&e(%{server::%{_servername}%::owner}%)&3のタイム&a%{server::%{_servername}%::owner_time}%"
 			delete {playerdata.%player%::already_clicked}
+			detection_start_point(player)
 			server_item(player)
 			stop
 		if name of clicked item contain "サーバーの名前を変える":
@@ -824,7 +825,7 @@ on inventory click:
 	command "/mv tp %player% %{playerdata.%player%::joined_server}%" #server TP
 	set {playerdata.%player%::joining} to true #player joined
 	delete {playerdata.%player%::checkpoint}
-	delete {playerdata.%player%::timer}
+	delete {timer.%player%}
 	delete {playerdata.%player%::owner}
 	if {server::%{playerdata.%player%::joined_server}%::already_played::%player%} is not set:
 		set {server::%{playerdata.%player%::joined_server}%::already_played::%player%} to floor(unix timestamp of now)
@@ -849,6 +850,7 @@ on inventory click:
 	if {server::%{_servername}%::owner_time} is set:
 		send "&3サーバーオーナー&e(%{server::%{_servername}%::owner}%)&3のタイム&a%{server::%{_servername}%::owner_time}%"
 	command "/effect %player% clear"
+	detection_start_point(player)
 	server_item(player)
 
 #-----Player server TP-------
@@ -896,6 +898,7 @@ command /ptp [<player>]:
 				if {server::%{playerdata.%arg 1%::joined_server}%::owner_time} is set:
 					send "&3サーバーオーナー&e(%{server::%{playerdata.%arg 1%::joined_server}%::owner}%)&3のタイム&a%{server::%{playerdata.%arg 1%::joined_server}%::owner_time}%"
 				command "/effect %player% clear"
+				detection_start_point(player)
 				server_item(player)
 				stop
 			else: #Not relese
@@ -923,6 +926,7 @@ command /ptp [<player>]:
 					set gamemode of player to creative
 				send "&6/backでロビーに戻れます"
 				set {playerdata.%player%::joining} to true
+				detection_start_point(player)
 				stop
 		else:
 			command "/effect %player% clear"
@@ -943,6 +947,7 @@ command /ptp [<player>]:
 			else:
 				teleport player to location at (0, 4, 0)
 			server_item(player)
+			detection_start_point(player)
 			stop
 			
 
@@ -955,7 +960,7 @@ command /back:
 	trigger:
 		delete {playerdata.%player%::joining} #joining other server check
 		remove player from {server::%{playerdata.%player%::joined_server}%::playing::*}
-		delete {playerdata.%player%::timer} #Timer stop
+		set {timer.%player%} to unix timestamp of now #Timer stop
 		delete {playerdata.%player%::check}
 		delete {playerdata.%player%::checkpoint} #チェックポイント削除
 		delete {playerdata.%player%::joined_server}
@@ -980,7 +985,7 @@ command /back:
 on quit:
 	delete {playerdata.%player%::joining} #joining other server check
 	remove player from {server::%{playerdata.%player%::joined_server}%::playing::*}
-	delete {playerdata.%player%::timer} #Timer stop
+	delete {timer.%player%} #Timer stop
 	delete {playerdata.%player%::check}
 	delete {playerdata.%player%::checkpoint} #チェックポイント削除
 	delete {playerdata.%player%::joined_server}
@@ -1102,6 +1107,8 @@ on inventory click:
 			send "&cサーバーを公開するには&dスポーン地点&cが必要です。"
 			stop
 		set {playerdata.%player%::check} to true
+		delete {timer.%player%}
+		detection_start_point(player)
 		send "&6サーバーを公開するには自分の作成したアスレをクリアする必要があります。"
 		set gamemode of player to adventure
 		clear player's inventory

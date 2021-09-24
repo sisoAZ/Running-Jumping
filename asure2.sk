@@ -17,6 +17,7 @@ on break:
 			send "&cこのサーバーは既に公開済みなので編集ができません"
 
 on place:
+	set {timer.%player%} to unix timestamp of now - 60
 	if {server::%{playerdata.%player%::joined_server}%::relese} is true:
 		cancel event
 		if {playerdata.%player%::owner} is true:
@@ -516,18 +517,32 @@ function timer(p: player):
 			stop
 
 #-------Timer start------
-on walking on lapis block:
-	$ thread
-	set {timer.%player%} to unix timestamp of now #タイマー
-	if gamemode of player is adventure or creative:
-		if {server::%{playerdata.%player%::joined_server}%::startpoint} is location of event-block:
-			set {playerdata.%player%::timer} to true
-			if {playerdata.%player%::practice_mode} is true:
-				send "&c練習モードの状態ではタイマーは開始されません"
-				stop
-			send "&a%{playerdata.%player%::display_name}% &6Start"
-			sound("block.note.pling", player, 2)
-			delete {playerdata.%player%::checkpoint}
+function detection_start_point(p: player):
+	if {playerdata.%{_p}%::joining} is true:
+		if gamemode of {_p} is adventure or creative:
+			while {timer.%{_p}%} is not set:
+				if distance between {server::%{playerdata.%{_p}%::joined_server}%::startpoint} and location of {_p} <= 0.9:
+					set {timer.%{_p}%} to unix timestamp of now #タイマー
+					if {playerdata.%{_p}%::practice_mode} is true:
+						send "&c練習モードの状態ではタイマーは開始されません" to {_p}
+						stop
+					send "&a%{playerdata.%{_p}%::display_name}% &6Start" to {_p}
+					sound("block.note.pling", {_p}, 2)
+					delete {playerdata.%{_p}%::checkpoint}
+					stop					
+				wait 1 tick
+
+#on walking on lapis block:
+#	$ thread
+#	set {timer.%player%} to unix timestamp of now #タイマー
+#	if gamemode of player is adventure or creative:
+#		if {server::%{playerdata.%player%::joined_server}%::startpoint} is location of event-block:
+#			if {playerdata.%player%::practice_mode} is true:
+#				send "&c練習モードの状態ではタイマーは開始されません"
+#				stop
+#			send "&a%{playerdata.%player%::display_name}% &6Start"
+#			sound("block.note.pling", player, 2)
+#			delete {playerdata.%player%::checkpoint}
 
 #------Timer end--------
 on walking on diamond block:
@@ -538,13 +553,13 @@ on walking on diamond block:
 	if {playerdata.%player%::check} is true:
 		set {server::%{playerdata.%player%::joined_server}%::owner_time} to unix timestamp of now - {timer.%player%}
 		server_diff(player)
-		delete {playerdata.%player%::timer}
+		delete {timer.%player%}
 		delete {playerdata.%player%::check}
 		server_item(player)
 		set gamemode of player to creative
 		send "&a難易度を設定してサーバーを公開しましょう。"
 		stop
-	if {playerdata.%player%::timer} is not true:
+	if {timer.%player%} is not set:
 		send "&4&lOops! あなたはタイマースタートのブロックを踏んでいなかったようだ！"
 		if {playerdata.%player%::owner} is not true:
 			add player to {server::%{playerdata.%player%::joined_server}%::goal::*}
@@ -557,6 +572,8 @@ on walking on diamond block:
 	send "&b%{playerdata.%player%::display_name}% &bEnded!"
 	sound("entity.player.levelup", player)
 	delete {playerdata.%player%::checkpoint}
+	delete {timer.%player%}
+	detection_start_point(player)
 	send "&bTime:&a&l%{time.%player%}%"
 	if {server::%{playerdata.%player%::joined_server}%::relese} is true:
 		broadcast "&e%player%&6さんが&d%{playerdata.%player%::display_name}%&6をゴールしました。 &bTime:&a&l%{time.%player%}%"
@@ -945,20 +962,21 @@ on rightclick holding eye of ender:
 				stop
 			if {server::%{playerdata.%player%::joined_server}%::spawn} is set:
 				teleport player to {server::%{playerdata.%player%::joined_server}%::spawn}
-				delete {playerdata.%player%::timer}
+				delete {timer.%player%}
+				detection_start_point(player)
 				stop
 			else:
 				teleport player to location at (0, 20, 0)
-				delete {playerdata.%player%::timer}
+				delete {timer.%player%}
+				detection_start_point(player)
 				stop
 
 #------practice mode-------
 on rightclick holding feather:
 	name of player's held item contain "練習モード"
 	{playerdata.%player%::joining} is true
-	delete {playerdata.%player%::timer}
+	delete {timer.%player%}
 	delete {playerdata.%player%::checkpoint}
-	teleport player to {server::%{playerdata.%player%::joined_server}%::spawn}
 	if {playerdata.%player%::practice_mode} is not set:
 		set {playerdata.%player%::practice_mode} to true
 		set player's flight mode to true
@@ -969,6 +987,9 @@ on rightclick holding feather:
 		delete {playerdata.%player%::practice_mode}
 		set player's flight mode to false
 		send "&c練習モードを解除しました"
+		teleport player to {server::%{playerdata.%player%::joined_server}%::spawn}
+		delete {timer.%player%}
+		detection_start_point(player)
 		stop
 
 #------return server edit------
@@ -1186,7 +1207,6 @@ on walking on lapis block:
 	gamemode of player is adventure or creative
 	{event::start::*} contain location of event-block
 	send "{@e} &b%{playerdata.%player%::display_name}% &6Start"
-	set {playerdata.%player%::timer} to true
 	delete {playerdata.%player%::checkpoint}
 	timer(player)
 
@@ -1247,10 +1267,12 @@ on rightclick holding eye of ender:
 	if {event::spawn} is set:
 		teleport player to {event::spawn}
 		delete {playerdata.%player%::timer}
+		detection_start_point(player)
 		stop
 	else:
 		teleport player to location at (0, 20, 0)
 		delete {playerdata.%player%::timer}
+		detection_start_point(player)
 		stop
 
 #---------------------
@@ -1462,11 +1484,10 @@ on creative inventory click:
 			stop
 
 #Name Item
-on creative inventory click:
-	if name of event-item is set:
-		if event-item is chest or anvil:
+on place:
+	if event-block's inventory is set:
+		if "%nbt of event-block%" contains "CustomName":
 			cancel event
-			stop
 
 #Brewing
 on inventory click:
