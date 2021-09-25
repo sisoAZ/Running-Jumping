@@ -753,6 +753,13 @@ on inventory click:
 on inventory click:
 	name of player's current inventory contain "このサーバーに評価しますか？"
 	cancel event
+	if clicked item is gray wool:
+		if name of clicked item is "クソアスレ":
+			kick player due to "そんなこと言うな！！！！！"
+		else:
+			send "そですか..."
+			close player's inventory
+			stop
 	clicked slot is 3 or 5
 	if name of clicked item contain "いいねする":
 		if {playerdata.%player%::iine_point} <= 0:
@@ -849,7 +856,6 @@ on inventory click:
 		send "&6%{playerdata.%player%::display_name}%&3のベストタイム&a%{server::%{_servername}%::ranking::%player%}%"
 	if {server::%{_servername}%::owner_time} is set:
 		send "&3サーバーオーナー&e(%{server::%{_servername}%::owner}%)&3のタイム&a%{server::%{_servername}%::owner_time}%"
-	command "/effect %player% clear"
 	detection_start_point(player)
 	server_item(player)
 
@@ -897,12 +903,12 @@ command /ptp [<player>]:
 					send "&6%player%&3のベストタイム&a%{server::%{playerdata.%arg 1%::joined_server}%::ranking::%player%}%"
 				if {server::%{playerdata.%arg 1%::joined_server}%::owner_time} is set:
 					send "&3サーバーオーナー&e(%{server::%{playerdata.%arg 1%::joined_server}%::owner}%)&3のタイム&a%{server::%{playerdata.%arg 1%::joined_server}%::owner_time}%"
-				command "/effect %player% clear"
+				
 				detection_start_point(player)
 				server_item(player)
 				stop
 			else: #Not relese
-				command "/effect %player% clear"
+				
 				if {playerdata.%player%::joined_server} is set:
 					remove player from {server::%{playerdata.%player%::joined_server}%::playing::*}
 				set {playerdata.%player%::joined_server} to {playerdata.%arg 1%::joined_server}
@@ -929,7 +935,7 @@ command /ptp [<player>]:
 				detection_start_point(player)
 				stop
 		else:
-			command "/effect %player% clear"
+			
 			if {playerdata.%player%::joined_server} is set:
 				remove player from {server::%{playerdata.%player%::joined_server}%::playing::*}
 			set {playerdata.%player%::display_name} to {server::%{playerdata.%arg 1%::joined_server}%::servername}
@@ -992,7 +998,6 @@ on quit:
 	delete {playerdata.%player%::owner}
 	delete {playerdata.%player%::invite}
 	delete {effect_double.%player%}
-	command "/effect %player% clear"
 	delete {server::<none>::relese} #バグ対策
 	wait 1 seconds
 	preload()

@@ -345,6 +345,7 @@ function luckperms_setup():
 	command "/luckperms group worldedit permission set worldedit.tool.* true"
 	command "/luckperms group worldedit permission set worldedit.biome.* true"
 	command "/luckperms group worldedit permission set worldedit.navigation.* true"
+	command "/luckperms group worldedit permission set worldedit.generation.* true"
 	command "/luckperms group worldedit permission set worldedit.global-mask true"
 	command "/luckperms group worldedit permission set worldedit.fixwater true"
 	command "/luckperms group worldedit permission set worldedit.generation.cylinder true"
@@ -356,6 +357,9 @@ function luckperms_setup():
 	command "/luckperms group worldedit permission set worldedit.brush.* true"
 	command "/luckperms group worldedit permission set worldedit.schematic.load true"
 	command "/luckperms group worldedit permission set worldedit.schematic.load.other true"
+	command "/luckperms group worldedit permission set worldedit.clipboard.load true"
+	command "/luckperms group worldedit permission set worldedit.schematic.formats true"
+	command "/luckperms group worldedit permission set worldedit.schematic.upload true"
 	command "/luckperms group worldedit permission set worldedit.help true"
 	command "/luckperms group worldedit permission set fawe.admin true"
 
@@ -529,6 +533,7 @@ function detection_start_point(p: player):
 					send "&a%{playerdata.%{_p}%::display_name}% &6Start" to {_p}
 					sound("block.note.pling", {_p}, 2)
 					delete {playerdata.%{_p}%::checkpoint}
+					command "/effect %{_p}% clear"
 					stop					
 				wait 1 tick
 
@@ -582,6 +587,7 @@ on walking on diamond block:
 			add player to {server::%{playerdata.%player%::joined_server}%::goal::*}
 			add {playerdata.%player%::joined_server} to {playerdata.%player%::goal::*}
 			add 1 to {playerdata.%player%::clears}
+			iine_evaluate(player)
 	if {server::%{playerdata.%player%::joined_server}%::permission::*} contain player:
 		send "&c運営はランキングに記録されません"
 		stop
@@ -970,6 +976,20 @@ on rightclick holding eye of ender:
 				delete {timer.%player%}
 				detection_start_point(player)
 				stop
+
+#-----iine evaluate-------
+function iine_evaluate(p: player):
+	set {playerdata.%{_p}%::iine_select_server} to {playerdata.%{_p}%::joined_server}
+	open chest with 1 row named "&6このサーバーに評価しますか？" to {_p}
+	set slot 0 of {_p}'s current inventory to gray wool named "&8もう少しかなぁ"
+	set slot 1 of {_p}'s current inventory to gray wool named "&8うーーーーーーん"
+	set slot 2 of {_p}'s current inventory to gray wool named "&8なんか足りないなぁ..."
+	set slot 3 of {_p}'s current inventory to light green wool named "&aいいねする"
+	set slot 4 of {_p}'s current inventory to barrier block named "&6評価するサーバー&f:&a%{server::%{playerdata.%{_p}%::iine_select_server}%::servername}%" with lore "&e%{_p}%&6のいいねポイント&f:%{playerdata.%{_p}%::iine_point}%"
+	set slot 5 of {_p}'s current inventory to red wool named "&cキャンセル"
+	set slot 6 of {_p}'s current inventory to gray wool named "&8爽快感が無いような..."
+	set slot 7 of {_p}'s current inventory to gray wool named "&8イライラするわ！！"
+	set slot 8 of {_p}'s current inventory to gray wool named "&8クソアスレ"
 
 #------practice mode-------
 on rightclick holding feather:
