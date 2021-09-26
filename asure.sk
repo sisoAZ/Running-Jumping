@@ -673,7 +673,7 @@ function sort_server_details(p: player, sort: text, sort_text: text = ""):
 			open chest with 6 row named "&b&lRanked Server list" to {_p}
 		if {_sort} is "mcid":
 			open chest with 6 row named "&e&lMCID Server list" to {_p}
-		set {_reverse_id::*} to reversed({server::id::*}) #Reverse
+		set {_reverse_id::*} to get_preload_servers() #preload.skの関数を使用
 		loop {_reverse_id::*}:
 			set {server.page.%{_p}%::%loop-index%} to loop-value
 

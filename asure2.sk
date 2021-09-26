@@ -18,6 +18,10 @@ on break:
 
 on place:
 	set {timer.%player%} to unix timestamp of now - 60
+	if {playerdata.%player%::check} is true:
+		send "&cクリアテストではブロックを設置できません"
+		cancel event
+		stop
 	if {server::%{playerdata.%player%::joined_server}%::relese} is true:
 		cancel event
 		if {playerdata.%player%::owner} is true:
@@ -1315,7 +1319,7 @@ on skript stop:
 #Debug
 #------------
 command /debug [<text>] [<text>] [<text>]:
-	permission: siso
+	permission: asure.admin
 	trigger:
 		if arg 1 is not set:
 			send "&3&l/debug &6&l(player|info|delete|set)"
@@ -1569,6 +1573,10 @@ command /cmdblock [<text>] [<text>]:
 		#stop
 
 on command:
+	if {playerdata.%player%::check} is true:
+		send "&cクリアチェックの時はすべてのコマンドが無効になります"
+		cancel event
+		stop
 	command contain "/"
 	if command is "/wea":
 		stop
