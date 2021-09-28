@@ -1090,6 +1090,7 @@ function server_settings(p: player):
 	set slot 2 of {_p}'s current inventory to gold block named "&6スポーン地点を設定する。" with lore "&6今立っている地点をスポーン地点に設定します。" and "&5&l※顔の向きも反映されます"
 	set slot 3 of {_p}'s current inventory to name tag named "&9権限者を設定する。" with lore "&6信用できるプレイヤーを選びましょう。"
 	set slot 4 of {_p}'s current inventory to sunflowers named "&dプレイヤーを招待する。" with lore "&6サーバーを遊んでもらいましょう。"
+	set slot 5 of {_p}'s current inventory to wooden axe named "&3便利ツール" with lore "&6便利なツールがここに詰まっています。"
 	stop
 
 #----inv click (menu)----
@@ -1203,6 +1204,12 @@ on inventory click:
 			set slot {_slotnum} of player's current inventory to skull of loop-player named "&6&l%loop-player%"
 			add 1 to {_slotnum}
 		stop
+	if name of clicked item contains "便利ツール":
+		wait 1 tick #バグ防止
+		open chest with 1 row named "&6便利ツール" to player
+		set {_head} to ender dragon skull item
+		set data value of {_head} to 3
+		set slot 0 of player's current inventory to {_head} named "&6頭ブロック集"
 
 #-------other inv click-------
 on inventory click:
@@ -1504,7 +1511,12 @@ on inventory click:
 				set slot {_slots} of player's current inventory to paper named {_split_comment::1} with lore "&6Player: &e%{_split_comment::2}%" and "&6Location: &9%{_location}%"
 				add 1 to {_slots}
 			stop
-							
+	#---------Build Tools----------
+	if name of player's current inventory contain "便利ツール":
+		cancel event
+		clicked item is set
+		if name of clicked item contains "頭ブロック集":
+			execute player command "/head"
 
 #-----server setting menu open----------
 on rightclick holding clock:

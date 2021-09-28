@@ -1,0 +1,106 @@
+function url(s: string) :: string:
+	replace all "§" in {_s} with "&"
+	return {_s}
+
+command /head [<text>] [<number>] [<text>]:
+	trigger:
+		set {_head_categories::*} to "alphabet", "animals", "blocks", "decoration", "food-drinks", "humans", "humanoid", "miscellaneous", "monsters" and "plants"
+		if {_head_categories::*} contains arg-1:
+			send "&3Loading..."
+			set {url} to url("https://minecraft-heads.com/scripts/api.php?cat=%arg-1%")
+			send a request to {url}
+			delete {url}
+			set {_body} to the last received http web response's body
+			copy json {_body} to {_json::*}
+			open chest with 6 rows named "&6Head Data Base - %arg-1%" to player
+			set {_s} to 0
+			set {_page} to 1
+			loop {_json::*}:
+				set {_head_uuid_and_value::%{_page}%::%{_json::%loop-index%::uuid}%} to {_json::%loop-index%::value}
+				set {_head_uuid_and_name::%{_page}%::%{_json::%loop-index%::uuid}%} to {_json::%loop-index%::name}
+				add 1 to {_s}
+				if {_s} is ((9*6)-1):
+					add 1 to {_page}
+					set {_s} to 0
+			if arg-2 is set:
+				set {_page} to arg-2
+			else:
+				set {_page} to 1
+			set {_s} to 0
+			loop {_head_uuid_and_value::%{_page}%::*}:
+				if arg-3 is set:
+					if {_head_uuid_and_name::%{_page}%::%loop-index%} contains arg-3:
+						if {favorite_heads::%player%::%{_head_uuid_and_name::%{_page}%::%loop-index%}%} is set:
+							set slot {_s} of player's current inventory to glowing skull of player with nbt "{display:{Name:""""},SkullOwner:{Id:""%loop-index%"",Properties:{textures:[{Value:""%loop-value%""}]}}}" named "&6%{_head_uuid_and_name::%{_page}%::%loop-index%}%" with lore "&eFavorite"
+						else:
+							set slot {_s} of player's current inventory to skull of player with nbt "{display:{Name:""""},SkullOwner:{Id:""%loop-index%"",Properties:{textures:[{Value:""%loop-value%""}]}}}" named "&6%{_head_uuid_and_name::%{_page}%::%loop-index%}%"
+							add 1 to {_s}
+				else:
+					if {favorite_heads::%player%::%{_head_uuid_and_name::%{_page}%::%loop-index%}%} is set:
+						set slot {_s} of player's current inventory to glowing skull of player with nbt "{display:{Name:""""},SkullOwner:{Id:""%loop-index%"",Properties:{textures:[{Value:""%loop-value%""}]}}}" named "&6%{_head_uuid_and_name::%{_page}%::%loop-index%}%" with lore "&eFavorite"
+					else:
+						set slot {_s} of player's current inventory to skull of player with nbt "{display:{Name:""""},SkullOwner:{Id:""%loop-index%"",Properties:{textures:[{Value:""%loop-value%""}]}}}" named "&6%{_head_uuid_and_name::%{_page}%::%loop-index%}%"
+					add 1 to {_s}
+			add 1 to {_page}
+			if {_head_uuid_and_value::%{_page}%::*} is set:
+				set slot {_s} of player's current inventory to book named "NEXT PAGE!" with lore "&8%{_page}%||&8%arg-1%"
+		else:
+			open chest with 2 rows named "&6Head Data Base" to player
+			loop size of {_head_categories::*} times:
+				set slot loop-number -1 of player's current inventory to book named "%{_head_categories::%loop-number%}%"
+			set slot 15 of player's current inventory to ender chest named "&eFavorites" with lore "&eRight-click on the head to add it to your favorites."
+			set slot 16 of player's current inventory to nametag named "&6Search by Text"
+			set {_head} to ender dragon skull item
+			set data value of {_head} to 3
+			set slot 17 of player's current inventory to {_head} named "&3Get player head"
+
+on inventory click:
+	if name of player's current inventory is "&6Head Data Base":
+		cancel event
+		if clicked item is book:
+			if {head_serach_by_text.%player%} is set:
+				make player execute command "/head %uncolored name of clicked item% 1 %{head_serach_by_text.%player%}%"
+				delete {head_serach_by_text.%player%}
+			else:
+				make player execute command "/head %uncolored name of clicked item%"
+			close player's inventory
+		if name of clicked item is "&eFavorites":
+			open chest with 6 rows named "&6Head Data Base - Favorites" to player
+			set {_s} to 0
+			loop {favorite_heads::%player%::*}:
+				set slot {_s} of player's current inventory to loop-value named "&6%loop-index%"
+				add 1 to {_s}
+		if name of clicked item is "&3Get player head":
+			set {_head} to ender dragon skull item
+			set data value of {_head} to 3
+			open anvil gui named "serach_by_mcid" with icon {_head} text "" for player
+		if name of clicked item is "&6Search by Text":
+			open anvil gui named "serach_by_text" with icon nametag text "" for player
+	else if name of player's current inventory contains "&6Head Data Base - ":
+		clicked item is set
+		cancel event
+		if clicked item is book:
+			close player's inventory
+			set {_s::*} to uncolored line 1 of lore of clicked item split at "||"
+			make player execute command "/head %{_s::2}% %{_s::1}%"
+			stop
+		if click type is right mouse button:
+			if {favorite_heads::%player%::%uncolored name of clicked item%} is set:
+				delete {favorite_heads::%player%::%uncolored name of clicked item%}
+				send "&cRemove favorite head: %name of clicked item%"
+			else:
+				set {favorite_heads::%player%::%uncolored name of clicked item%} to clicked item
+				set {_item} to clicked item
+				send "&aAdded favorite head: %name of clicked item%"
+		else:
+			give clicked item to player
+
+On anvil gui done:
+	set {_anvil_name} to anvil gui name of anvil gui of player
+	if {_anvil_name} is "serach_by_mcid":
+		give skull of event-string parsed as offline player to player
+	if {_anvil_name} is "serach_by_text":
+		set {head_serach_by_text.%player%} to event-string
+		wait a tick
+		make player execute command "/head"
+		send "&aSet text to %event-string%"
