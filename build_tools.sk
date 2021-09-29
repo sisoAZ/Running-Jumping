@@ -73,7 +73,6 @@ function Iris_Exinvitem(p: player):
 #Hanbun Breaker
 on break:
 	if {Irissetting.%player%::hanbun} is false:
-		send "YEP"
 		stop
 	#Hanbun Breaker
 	#Block ID特定
@@ -120,7 +119,7 @@ on command:
 		if {_c} is "gmask" or "/gmask" or "globalmask" or "/globalmask":
 
 			if {Irissetting.%player%::48} is not set:
-				send action bar "&6&nGmask:&7&n <None>" to player
+				send action bar "&6&nGmask:&7&n None" to player
 			delete {Iris.gmask.%player%}
 			delete {Iris.gmask3.%player%}
 
