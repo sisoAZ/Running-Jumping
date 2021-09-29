@@ -1210,6 +1210,7 @@ on inventory click:
 		set {_head} to ender dragon skull item
 		set data value of {_head} to 3
 		set slot 0 of player's current inventory to {_head} named "&6頭ブロック集"
+		set slot 1 of player's current inventory to golden axe named "&d建築アシスト"
 
 #-------other inv click-------
 on inventory click:
@@ -1517,6 +1518,9 @@ on inventory click:
 		clicked item is set
 		if name of clicked item contains "頭ブロック集":
 			execute player command "/head"
+			stop
+		if name of clicked item contains "建築アシスト":
+			show_build_assist_menu(player) #build_tools.sk
 
 #-----server setting menu open----------
 on rightclick holding clock:

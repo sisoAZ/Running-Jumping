@@ -1,0 +1,180 @@
+function show_build_assist_menu(p: player):
+	open chest inventory with 1 rows named "&d&lBuild Assist Tools" to {_p}
+	play sound "item.shield.block" with volume 0.8 with pitch 1.5 at {_p} for {_p}
+	set {_status_hanbun} to "&aON"
+	set {_status_advance_we} to "&aON"
+	if {Irissetting.%{_p}%::hanbun} is false:
+		set {_status_hanbun} to "&cOFF"
+	if {Irissetting.%{_p}%::advanced_we} is false:
+		set {_status_advance_we} to "&cOFF"
+	set slot 0 of current inventory of {_p} to barrier named "&5特殊ブロック一覧" with lore "&6通常手に入らないブロックを入手できます"
+	set slot 1 of current inventory of {_p} to bottom oak wood slab named "&9半ブロック半壊し" with lore "&6半ブロックを壊す際半分だけ壊すことができます" and "&3状態: %{_status_hanbun}%"
+	set slot 2 of current inventory of {_p} to wooden axe named "&2空中Pos" with lore "&6空中で木斧を右、左クリックすると" and "&6その場でposが設定できます" and "&3状態: %{_status_advance_we}%"
+
+on inventory click:
+	if name of player's current inventory contain "Build Assist Tools":
+		if name of clicked item contains "特殊ブロック一覧":
+			Iris_Exinvitem(player)
+		if name of clicked item contains "半ブロック半壊し" or "空中Pos":
+			set {_status} to Irits_item_get_status(uncolored lore of clicked item)
+			if name of clicked item contains "半ブロック半壊し":
+				if {_status} is false:
+					delete {Irissetting.%player%::hanbun}
+				else if {_status} is true:
+					set {Irissetting.%player%::hanbun} to false
+				show_build_assist_menu(player)
+			if name of clicked item contains "空中Pos":
+				if {_status} is false:
+					delete {Irissetting.%player%::advanced_we}
+				else if {_status} is true:
+					set {Irissetting.%player%::advanced_we} to false
+				show_build_assist_menu(player)
+
+function Irits_item_get_status(lores: objects) :: boolean:
+	loop {_lores::*}:
+		if loop-value contains "状態":
+			set {_split_lore::*} to loop-value split at "状態: "
+			if {_split_lore::2} is "ON":
+				set {_boolean} to true
+			else:
+				set {_boolean} to false
+	return {_boolean}
+
+function Iris_Exinvitem(p: player):
+	open chest inventory with 4 rows named "&2&nExtra blocks Inventory" to {_p}
+	play sound "item.shield.block" with volume 0.8 with pitch 1.5 at {_p} for {_p}
+	set {_lore::*} to split "&8You can Lock/Unlock some GUI blocks!\n&8( NBT: {Lock:""&&85Master Key &&8e[Open mode]""} )\n&dRight click:&7 lock/unlock/open clicked block.\n&dShift + Right click:&7 change key mode" at "\n"
+	set {_lore2::*} to split "&8Change your speeds.\n&8(Minecraft default: 0.2/0.15)\n&dRight click:&7 increase speed by 0.1\n&dLeft click:&7 decrease speed by 0.1\n&eDrop(Q):&7 change speed tool\n&dDrop(Q) in inventory:&c delete speed tool \n" at "\n"
+	set slot 9 of current inventory of {_p} to command block
+	set slot 10 of current inventory of {_p} to chain command block
+	set slot 11 of current inventory of {_p} to repeating command block
+	set slot 12 of current inventory of {_p} to minecart with command block
+	set slot 13 of current inventory of {_p} to barrier
+	set slot 14 of current inventory of {_p} to structure block
+	set slot 15 of current inventory of {_p} to structure void
+	set slot 16 of current inventory of {_p} to stone oak wooden slab
+	set slot 17 of current inventory of {_p} to dragon egg
+	set slot 18 of current inventory of {_p} to grass path
+	set slot 19 of current inventory of {_p} to farmland
+	set slot 20 of current inventory of {_p} to red mushroom block
+	set slot 21 of current inventory of {_p} to brown mushroom block
+	set slot 22 of current inventory of {_p} to chiseled quartz block with name "&fキノコの柄" with lore "&8minecraft:brown_mushroom_block 15"
+	set slot 23 of current inventory of {_p} to sand with name "&fキノコブロック" with lore "&8minecraft:brown_mushroom_block"
+	set slot 24 of current inventory of {_p} to furnace of fortune 10 with name "&f燃焼中のかまど" with lore "&8minecraft:lit_furnace"
+	set slot 27 of current inventory of {_p} to oak log of fortune 10 with name "&fオークの樹幹" with lore "&8minecraft:log 12"
+	set slot 28 of current inventory of {_p} to spruce log of fortune 10 with name "&fマツの樹幹" with lore "&8minecraft:log 13"
+	set slot 29 of current inventory of {_p} to birch log of fortune 10 with name "&fシラカバの樹幹" with lore "&8minecraft:log 14"
+	set slot 30 of current inventory of {_p} to jungle log of fortune 10 with name "&fジャングルの樹幹" with lore "&8minecraft:log 15"
+	set slot 31 of current inventory of {_p} to acacia log of fortune 10 with name "&fアカシアの樹幹" with lore "&8minecraft:log2 12"
+	set slot 32 of current inventory of {_p} to dark oak log of fortune 10 with name "&fダークオークの樹幹" with lore "&8minecraft:log2 13"
+	loop 9 times:
+		set slot loop-number - 1 of current inventory of {_p} to gray stained glass pane named "&f"
+
+#Hanbun Breaker
+on break:
+	if {Irissetting.%player%::hanbun} is false:
+		send "YEP"
+		stop
+	#Hanbun Breaker
+	#Block ID特定
+	if "%event-block%" is "DOUBLE_STEP":
+		set {_id} to stone slab
+	else if "%event-block%" is "DOUBLE_STONE_SLAB2":
+		set {_id} to red sandstone slab
+	else if "%event-block%" is "WOOD_DOUBLE_STEP":
+		set {_id} to oak wood slab
+	else if "%event-block%" is "double purpur slab":
+		set {_id} to purpur slab
+	{_id} is set
+	set {_meta} to data value of event-block #壊したブロックのMeta特定
+	if {_meta} >= 8:
+		subtract 8 from {_meta}
+	
+	set {_distance} to distance between player's eye location and event-block's location #メイン処理
+	
+	add Iris_Hanbun_breakPoint(player, {_distance}, event-location) to {_meta}
+	cancel event
+	set block at location at event-block to {_id} #place with no meta
+	set data value of block at event-location to {_meta}
+
+function Iris_Hanbun_breakPoint(p: player, distance: number, loc: location) :: number:
+	loop 10 times:
+		block {_distance} - (loop-number - 1) * 0.1 meters forward {_p}'s eye location is air
+		set {_air} to y-coordinate of location {_distance} - (loop-number - 1) * 0.1 meters forward {_p}'s eye
+		exit loop
+	set {_y} to y-coordinate of {_loc}
+	if {_air} is less than {_y}: #下破壊の時にMeta値 +8
+		add 8 to {_meta}
+	return {_meta}
+
+#Gmask
+on command:
+
+	set {_p} to player
+	set {_c} to whole command
+
+	replace every "worldedit:" with "" in {_c}
+
+	#Gmask Assistant
+	if {_c} contains "gmask" or "globalmask":
+		if {_c} is "gmask" or "/gmask" or "globalmask" or "/globalmask":
+
+			if {Irissetting.%player%::48} is not set:
+				send action bar "&6&nGmask:&7&n <None>" to player
+			delete {Iris.gmask.%player%}
+			delete {Iris.gmask3.%player%}
+
+		else:
+			{Iris.gmask2.%player%} is not set
+			cancel event
+			set {_c::*} to split {_c} at " "
+			loop {_c::*}:
+				if loop-index is "2":
+					set {Iris.gmask.%player%} to loop-value
+					set {Iris.gmask2.%player%} to true
+					execute player command "/gmask %{Iris.gmask.%player%}%"
+					replace every "," with ", " in {Iris.gmask.%player%}
+					if {Irissetting.%player%::48} is not set:
+						send action bar "&6Gmask: &7%{Iris.gmask.%{_p}%}%" to {_p}
+						if {Iris.gmask3.%player%} is not set:
+							set {Iris.gmask3.%player%} to true
+							Iris_Gmask(player)
+					wait a tick
+					delete {Iris.gmask2.%player%}
+					stop
+
+function Iris_Gmask(p: player):
+	while {Iris.gmask.%{_p}%} is set:
+		send action bar "&6&nGmask:&7&n %{Iris.gmask.%{_p}%}%" to {_p}
+		wait 2 seconds
+
+on left click:
+	set {_p} to player
+	set {_tool} to player's tool
+
+	#Advanced WE-Wand
+	if {Irissetting.%player%::advanced_we} is false:
+		stop
+	if {_tool} is wooden axe:
+		{Iris.setting.%{_p}%::advanced_we} is not false
+		{_p}'s gamemode is creative
+		clicked block is not set
+		execute {_p} command "//pos1"
+
+on right click:
+	set {_p} to player
+	set {_tool} to player's tool
+
+	#Advanced WE-Wand
+	if {Irissetting.%player%::advanced_we} is false:
+		stop
+	if {_tool} is wooden axe:
+		{Iris.setting.%{_p}%::advanced_we} is not false
+		{_p}'s gamemode is creative
+		clicked block is not set
+		execute {_p} command "//pos2"
+
+#On quit
+on quit:
+	delete {Iris.gmask.%player%}
+	delete {Iris.gmask3.%player%}
